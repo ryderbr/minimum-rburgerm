@@ -8,6 +8,8 @@ RUNTIME := $(BUILD)/libminemu_kernel.a
 
 CORE_OBJECT := $(BUILD)/core/main.o
 IRQ_OBJECT := $(BUILD)/startup/irq.o
+SVC_OBJECT := $(BUILD)/startup/svc.o
+USER_OBJECT := $(BUILD)/startup/user.o
 RUNTIME_OBJECTS := \
 	$(BUILD)/runtime/block.o \
 	$(BUILD)/runtime/exception.o \
@@ -18,7 +20,7 @@ RUNTIME_OBJECTS := \
 	$(BUILD)/runtime/uart.o \
 	$(BUILD)/runtime/cprintf.o
 
-OBJECTS := $(CORE_OBJECT) $(IRQ_OBJECT) $(RUNTIME_OBJECTS)
+OBJECTS := $(CORE_OBJECT) $(IRQ_OBJECT) $(SVC_OBJECT) $(USER_OBJECT) $(RUNTIME_OBJECTS)
 DEPENDENCIES := $(OBJECTS:.o=.d)
 
 ARCH_FLAGS := -mcpu=cortex-a9 -marm -mfloat-abi=soft
@@ -60,9 +62,9 @@ $(RUNTIME): $(RUNTIME_OBJECTS)
 	@mkdir -p $(dir $@)
 	$(AR) rcs $@ $^
 
-$(KERNEL): $(CORE_OBJECT) $(IRQ_OBJECT) $(RUNTIME) linker/kernel.ld
+$(KERNEL): $(CORE_OBJECT) $(IRQ_OBJECT) $(SVC_OBJECT) $(USER_OBJECT) $(RUNTIME) linker/kernel.ld
 	@mkdir -p $(dir $@)
-	$(CC) $(LDFLAGS) $(CORE_OBJECT) $(IRQ_OBJECT) $(RUNTIME) $(LIBGCC) -o $@
+	$(CC) $(LDFLAGS) $(CORE_OBJECT) $(IRQ_OBJECT) $(SVC_OBJECT) $(USER_OBJECT) $(RUNTIME) $(LIBGCC) -o $@
 
 $(BUILD)/core/%.o: src/core/%.c
 	@mkdir -p $(dir $@)
