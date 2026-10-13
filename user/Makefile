@@ -1,4 +1,5 @@
-PROGRAMS := minimum-user
+PROGRAMS := minimum-user \
+			msh
 
 .PHONY: all lib programs clean $(PROGRAMS)
 

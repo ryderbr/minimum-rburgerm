@@ -2,7 +2,8 @@ MINEMU ?= minemu
 
 IMAGE := build/minimum.img
 KERNEL := ../kernel/build/minimum-kernel.elf
-USER_PROGRAM := ../user/prog/minimum-user/build/minimum-user.elf
+USER_PROGRAM := ../user/prog/minimum-user/build/minimum-user.elf \
+				../user/prog/msh/build/msh.elf
 
 KERNEL_INPUTS := $(wildcard ../kernel/src/core/*.c) \
 	$(wildcard ../kernel/src/runtime/*.c) \
@@ -13,12 +14,15 @@ KERNEL_INPUTS := $(wildcard ../kernel/src/core/*.c) \
 
 USER_INPUTS := $(wildcard ../user/prog/minimum-user/*.c) \
 	$(wildcard ../user/prog/minimum-user/*.S) \
+	$(wildcard ../user/prog/msh/*.c) \
+	$(wildcard ../user/prog/msh/*.S) \
 	$(wildcard ../user/lib/src/*.c) \
 	$(wildcard ../user/lib/include/*.h) \
 	../user/common/common.mk \
 	../user/common/user.ld \
 	../user/lib/Makefile \
-	../user/prog/minimum-user/Makefile
+	../user/prog/minimum-user/Makefile \
+	../user/prog/msh/Makefile
 
 .PHONY: all clean
 
@@ -28,7 +32,8 @@ $(KERNEL): $(KERNEL_INPUTS)
 	$(MAKE) -C ../kernel all
 
 $(USER_PROGRAM): $(USER_INPUTS)
-	$(MAKE) -C ../user/prog/minimum-user all
+	$(MAKE) -C ../user/prog/minimum-user all 
+	$(MAKE) -C ../user/prog/msh all
 
 $(IMAGE): minimum.toml $(KERNEL) $(USER_PROGRAM)
 	@mkdir -p $(dir $@)

@@ -17,7 +17,7 @@
 #define USER_IMAGE_BASE UINT32_C(0x00400000)
 #define USER_STACK_BOTTOM UINT32_C(0x007ff000)
 #define USER_STACK_TOP UINT32_C(0x00800000)
-#define MAX_USER_IMAGE_PAGES 16U
+#define MAX_USER_IMAGE_PAGES 4U
 #define SYSTEM_ROM_TABLE_COUNT 4U
 #define CPSR_MODE_MASK UINT32_C(0x1f)
 #define CPSR_MODE_USR UINT32_C(0x10)
@@ -441,7 +441,8 @@ struct minemu_trap_frame *minemu_svc_dispatch(struct minemu_trap_frame *frame) {
 }
 
 void minemu_kernel_main(const struct minemu_boot_info *boot_info) {
-    static const char module_name[] = "minimum-user";
+    static const char mimimum_module[] = "minimum-user";
+    static const char msh_module[] = "msh";
     if ((uintptr_t)boot_info != MINEMU_BOOT_INFO_VADDR ||
         boot_info->magic != MINEMU_BOOT_INFO_MAGIC ||
         boot_info->version != MINEMU_ABI_VERSION ||
@@ -455,7 +456,11 @@ void minemu_kernel_main(const struct minemu_boot_info *boot_info) {
         minemu_fail_stop();
     }
     const struct minemu_module_record *module =
-        find_module(boot_info, module_name, sizeof(module_name) - 1U);
+        find_module(boot_info, msh_module, sizeof(msh_module) - 1U);
+    if (module == NULL) {
+        module = find_module(boot_info, mimimum_module, sizeof(mimimum_module) - 1U);
+    }
+
     if (module == NULL || !load_user_module(boot_info, module)) {
         minemu_trace_event(UINT32_C(0xb007bad1));
         minemu_fail_stop();
